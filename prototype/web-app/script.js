@@ -767,17 +767,19 @@ function setStageButtons(hand) {
   const startRiverBtn = $("startRiverBtn");
 
   if (street === "preflop") {
-    startFlopBtn.disabled = !(over && state.temp.boardSelection.length === 3);
+    // Make it clickable after selecting enough board cards.
+    // If actions are not finished yet, the click handler will show a message.
+    startFlopBtn.disabled = !(state.temp.boardSelection.length === 3);
     startTurnBtn.disabled = true;
     startRiverBtn.disabled = true;
   } else if (street === "flop") {
     startFlopBtn.disabled = true;
-    startTurnBtn.disabled = !(over && state.temp.boardSelection.length === 1);
+    startTurnBtn.disabled = !(state.temp.boardSelection.length === 1);
     startRiverBtn.disabled = true;
   } else if (street === "turn") {
     startFlopBtn.disabled = true;
     startTurnBtn.disabled = true;
-    startRiverBtn.disabled = !(over && state.temp.boardSelection.length === 1);
+    startRiverBtn.disabled = !(state.temp.boardSelection.length === 1);
   } else {
     startFlopBtn.disabled = true;
     startTurnBtn.disabled = true;
