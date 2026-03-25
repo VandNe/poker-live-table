@@ -633,6 +633,9 @@ function renderPickers() {
     else if (t === "turn") title.textContent = `河牌：选 ${need} 张公牌`;
     else title.textContent = `公牌：选 ${need} 张`;
   }
+
+  // If the hand is active, board selection changes should immediately update stage buttons.
+  if (state.hand) setStageButtons(state.hand);
 }
 
 function initDealerSeatOptions() {
