@@ -124,6 +124,29 @@ input, select, button {
   border-radius: 12px;
 }
 
+.seat.currentActor {
+  outline: 3px solid rgba(251, 191, 36, 0.95);
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 4px rgba(251, 191, 36, 0.18),
+    0 0 24px rgba(251, 191, 36, 0.35);
+  animation: seatPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes seatPulse {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.05); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.turnTag {
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #fbbf24;
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
+}
+
 .seat .statusFold { color: #f87171; font-weight: 700; }
 .seat .statusAllIn { color: #fbbf24; font-weight: 700; }
 

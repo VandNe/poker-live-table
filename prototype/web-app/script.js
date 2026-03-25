@@ -703,6 +703,7 @@ function renderSeats(hand) {
     const seat = document.createElement("div");
     seat.className = "seat";
     if (p.id === hand.heroId) seat.classList.add("heroGlow");
+    if (hand.currentActorSeat === i) seat.classList.add("currentActor");
 
     const angle = (Math.PI * 2 * i) / hand.n - Math.PI / 2;
     const radius = 44; // visually tuned
@@ -718,11 +719,12 @@ function renderSeats(hand) {
     const statusAllin = p.status === "allin";
 
     const marker = isDealer ? `<div class="marker">庄</div>` : `<div class="marker" style="opacity:.0">-</div>`;
+    const turnTag = hand.currentActorSeat === i ? `<div class="turnTag">轮到</div>` : "";
 
     const cardRow = p.id === hand.heroId ? heroCardChips(hand.heroCards) : unknownCardChips();
 
     seat.innerHTML = `
-      <div class="seatId">${escapeHtml(p.id)}${marker}</div>
+      <div class="seatId">${escapeHtml(p.id)}${marker}${turnTag}</div>
       <div class="seatPos">${escapeHtml(p.positionLabel)}</div>
       <div class="stack">${Math.round(p.stack)}</div>
       ${statusFold ? `<div class="statusFold">弃</div>` : ""}
@@ -788,7 +790,12 @@ function setStageButtons(hand) {
 }
 
 function renderActionPanel(hand) {
-  $("handStatusPill").textContent = `进行中：${streetDisplay(hand.street)}`;
+  if (hand.currentActorSeat == null) {
+    $("handStatusPill").textContent = `进行中：${streetDisplay(hand.street)}（待下一位）`;
+  } else {
+    const actor = hand.players[hand.currentActorSeat];
+    $("handStatusPill").textContent = `进行中：${streetDisplay(hand.street)} · 轮到 ${actor.id}`;
+  }
   $("streetLabel").textContent = streetDisplay(hand.street);
   $("potLabel").textContent = Math.round(hand.pot);
   $("currentBetLabel").textContent = Math.round(hand.currentBet);
