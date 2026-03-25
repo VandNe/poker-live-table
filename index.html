@@ -41,12 +41,12 @@
           </label>
 
           <label>
-            SB
+            小盲
             <input id="sbInput" type="number" value="100" />
           </label>
 
           <label>
-            BB
+            大盲
             <input id="bbInput" type="number" value="100" />
           </label>
 
@@ -59,15 +59,25 @@
             补码数量（0 表示不补）
             <input id="rebuyAmountInput" type="number" value="5000" />
           </label>
+        </div>
 
-          <label class="span2">
-            你的手牌 (Hero) 如：As Kd
-            <input id="heroCardsInput" value="As Kd" />
-          </label>
+        <div class="pickerArea">
+          <div class="pickerHeader">
+            <div>
+              <div class="sectionTitle">2) 选你的两张手牌</div>
+              <div class="hint">点选两张卡牌（同一张不能重复）。</div>
+            </div>
+            <div class="actionsRow tight">
+              <button id="clearHandBtn" class="ghost">清空</button>
+            </div>
+          </div>
+
+          <div class="selectedRow" id="handSelectedRow">未选择</div>
+          <div id="handPicker" class="cardPicker" aria-label="手牌选择器"></div>
         </div>
 
         <div class="actionsRow">
-          <button id="startHandBtn" class="primary">开始本手牌（Preflop）</button>
+          <button id="startHandBtn" class="primary">开始本手（翻前）</button>
           <button id="resetBtn" class="ghost">重置</button>
         </div>
       </section>
@@ -83,10 +93,10 @@
                   <span class="k">街：</span><span id="streetLabel">preflop</span>
                 </div>
                 <div class="centerLine">
-                  <span class="k">底池 Pot：</span><span id="potLabel">0</span>
+                  <span class="k">底池：</span><span id="potLabel">0</span>
                 </div>
                 <div class="centerLine">
-                  <span class="k">当前跟注 CurrentBet：</span><span id="currentBetLabel">0</span>
+                  <span class="k">当前下注：</span><span id="currentBetLabel">0</span>
                 </div>
                 <div class="centerLine">
                   <span class="k">出牌顺序：</span><span id="orderLabel">-</span>
@@ -106,7 +116,7 @@
               <div class="sectionTitle">当前轮到</div>
               <div class="bigText" id="currentActorText">-</div>
               <div class="smallText">
-                <div>toCall：<span id="toCallLabel">0</span></div>
+                <div>需要补的金额：<span id="toCallLabel">0</span></div>
                 <div>你的建议/解释（仅基于概率）：</div>
               </div>
             </div>
@@ -116,31 +126,31 @@
               <div class="hint" id="actionHint">开始后会自动轮到某位玩家</div>
 
               <div class="actionBtns">
-                <button id="foldBtn" class="danger">fold</button>
-                <button id="checkBtn">check</button>
-                <button id="callBtn">call</button>
+                <button id="foldBtn" class="danger">弃牌</button>
+                <button id="checkBtn">过牌</button>
+                <button id="callBtn">跟注</button>
                 <div class="rowInline">
                   <label class="miniLabel">
-                    raise 到 (total bet)
+                    加注到（总下注）
                     <input id="raiseToInput" type="number" value="0" />
                   </label>
                 </div>
-                <button id="raiseBtn">raise</button>
-                <button id="allInBtn" class="warning">all-in</button>
+                <button id="raiseBtn">加注</button>
+                <button id="allInBtn" class="warning">全下</button>
               </div>
 
               <div class="nlArea">
                 <div class="sectionTitle">自然语言（可选）</div>
-                <input id="nlInput" placeholder="例：fold；call；raise 2400；all-in 1200" />
+                <input id="nlInput" placeholder="例：弃牌；过牌；跟注 200；加注 2400；全下 1200" />
                 <button id="parseNlBtn" class="ghost">解析并提交给当前行动者</button>
               </div>
             </div>
 
             <div class="cardPanel">
-              <div class="sectionTitle">建议输出（主引擎/备引擎）</div>
+              <div class="sectionTitle">建议输出（快算/准算）</div>
               <div class="actionsRow tight">
-                <button id="calcFastBtn">主引擎（快）</button>
-                <button id="calcAccurateBtn">备引擎（更准）</button>
+                <button id="calcFastBtn">快算</button>
+                <button id="calcAccurateBtn">准算</button>
               </div>
               <pre id="resultView" class="log"></pre>
             </div>
@@ -151,25 +161,22 @@
             </div>
 
             <div class="cardPanel">
-              <div class="sectionTitle">进入下一街</div>
-              <div class="boardInputs">
-                <label>
-                  flop (3 张)
-                  <input id="flopInput" placeholder="Ah 7c 2d" />
-                </label>
-                <button id="startFlopBtn" disabled>开始 Flop</button>
+              <div class="sectionTitle">进入下一阶段</div>
 
-                <label>
-                  turn (1 张)
-                  <input id="turnInput" placeholder="Kc" />
-                </label>
-                <button id="startTurnBtn" disabled>开始 Turn</button>
+              <div class="boardPickerHeader">
+                <div class="hint" id="boardPickerTitle">翻牌：选 3 张公牌</div>
+                <div class="actionsRow tight">
+                  <button id="clearBoardBtn" class="ghost">清空公牌选择</button>
+                </div>
+              </div>
 
-                <label>
-                  river (1 张)
-                  <input id="riverInput" placeholder="9s" />
-                </label>
-                <button id="startRiverBtn" disabled>开始 River</button>
+              <div class="selectedRow" id="boardSelectedRow">未选择</div>
+              <div id="boardPicker" class="cardPicker" aria-label="公牌选择器"></div>
+
+              <div class="actionsRow">
+                <button id="startFlopBtn" disabled>开始翻牌（确定 3 张）</button>
+                <button id="startTurnBtn" disabled>开始转牌（确定 1 张）</button>
+                <button id="startRiverBtn" disabled>开始河牌（确定 1 张）</button>
               </div>
             </div>
           </div>
