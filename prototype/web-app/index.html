@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Poker Live Assistant - MVP</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="topbar">
+        <div>
+          <div class="title">Poker Live Assistant</div>
+          <div class="subtitle">像德扑游戏一样：轮到谁就让你点按钮录入</div>
+        </div>
+        <div class="pill" id="handStatusPill">未开始手牌</div>
+      </header>
+
+      <section class="panel" id="setupPanel">
+        <h2>1) 牌桌/手牌设置</h2>
+
+        <div class="formGrid">
+          <label>
+            座位人数 (2-10)
+            <input id="nInput" type="number" value="6" min="2" max="10" />
+          </label>
+
+          <label>
+            玩家ID列表 (长度 = 人数，逗号分隔)
+            <input id="playerIdsInput" value="A,B,C,D,E,F" />
+          </label>
+
+          <label>
+            你的玩家ID (Hero)
+            <input id="heroIdInput" value="A" />
+          </label>
+
+          <label>
+            庄家位置是哪个座位(索引)
+            <select id="dealerSeatInput"></select>
+          </label>
+
+          <label>
+            SB
+            <input id="sbInput" type="number" value="100" />
+          </label>
+
+          <label>
+            BB
+            <input id="bbInput" type="number" value="100" />
+          </label>
+
+          <label>
+            起始牌局筹码
+            <input id="startingStackInput" type="number" value="10000" />
+          </label>
+
+          <label>
+            补码数量（0 表示不补）
+            <input id="rebuyAmountInput" type="number" value="5000" />
+          </label>
+
+          <label class="span2">
+            你的手牌 (Hero) 如：As Kd
+            <input id="heroCardsInput" value="As Kd" />
+          </label>
+        </div>
+
+        <div class="actionsRow">
+          <button id="startHandBtn" class="primary">开始本手牌（Preflop）</button>
+          <button id="resetBtn" class="ghost">重置</button>
+        </div>
+      </section>
+
+      <section class="panel hidden" id="gamePanel">
+        <h2>2) 扑克牌桌</h2>
+
+        <div class="tableLayout">
+          <div class="tableArea">
+            <div class="felt">
+              <div class="centerInfo">
+                <div class="centerLine">
+                  <span class="k">街：</span><span id="streetLabel">preflop</span>
+                </div>
+                <div class="centerLine">
+                  <span class="k">底池 Pot：</span><span id="potLabel">0</span>
+                </div>
+                <div class="centerLine">
+                  <span class="k">当前跟注 CurrentBet：</span><span id="currentBetLabel">0</span>
+                </div>
+                <div class="centerLine">
+                  <span class="k">出牌顺序：</span><span id="orderLabel">-</span>
+                </div>
+              </div>
+
+              <div class="boardArea" aria-label="公牌显示">
+                <div class="cardSlots" id="boardSlots"></div>
+              </div>
+
+              <div class="seats" id="seats"></div>
+            </div>
+          </div>
+
+          <div class="side">
+            <div class="cardPanel">
+              <div class="sectionTitle">当前轮到</div>
+              <div class="bigText" id="currentActorText">-</div>
+              <div class="smallText">
+                <div>toCall：<span id="toCallLabel">0</span></div>
+                <div>你的建议/解释（仅基于概率）：</div>
+              </div>
+            </div>
+
+            <div class="cardPanel">
+              <div class="sectionTitle">动作录入（按顺序出牌）</div>
+              <div class="hint" id="actionHint">开始后会自动轮到某位玩家</div>
+
+              <div class="actionBtns">
+                <button id="foldBtn" class="danger">fold</button>
+                <button id="checkBtn">check</button>
+                <button id="callBtn">call</button>
+                <div class="rowInline">
+                  <label class="miniLabel">
+                    raise 到 (total bet)
+                    <input id="raiseToInput" type="number" value="0" />
+                  </label>
+                </div>
+                <button id="raiseBtn">raise</button>
+                <button id="allInBtn" class="warning">all-in</button>
+              </div>
+
+              <div class="nlArea">
+                <div class="sectionTitle">自然语言（可选）</div>
+                <input id="nlInput" placeholder="例：fold；call；raise 2400；all-in 1200" />
+                <button id="parseNlBtn" class="ghost">解析并提交给当前行动者</button>
+              </div>
+            </div>
+
+            <div class="cardPanel">
+              <div class="sectionTitle">建议输出（主引擎/备引擎）</div>
+              <div class="actionsRow tight">
+                <button id="calcFastBtn">主引擎（快）</button>
+                <button id="calcAccurateBtn">备引擎（更准）</button>
+              </div>
+              <pre id="resultView" class="log"></pre>
+            </div>
+
+            <div class="cardPanel">
+              <div class="sectionTitle">行动记录</div>
+              <pre id="actionsView" class="log"></pre>
+            </div>
+
+            <div class="cardPanel">
+              <div class="sectionTitle">进入下一街</div>
+              <div class="boardInputs">
+                <label>
+                  flop (3 张)
+                  <input id="flopInput" placeholder="Ah 7c 2d" />
+                </label>
+                <button id="startFlopBtn" disabled>开始 Flop</button>
+
+                <label>
+                  turn (1 张)
+                  <input id="turnInput" placeholder="Kc" />
+                </label>
+                <button id="startTurnBtn" disabled>开始 Turn</button>
+
+                <label>
+                  river (1 张)
+                  <input id="riverInput" placeholder="9s" />
+                </label>
+                <button id="startRiverBtn" disabled>开始 River</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
+
