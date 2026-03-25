@@ -766,25 +766,24 @@ function actionHintText(hand) {
 
 function setStageButtons(hand) {
   const street = hand.street;
-  const over = isStreetOver(hand);
+  // Use UI-state first: if currentActorSeat is null, the stage is considered "done"
+  const stageReady = hand.currentActorSeat == null || isStreetOver(hand);
   const startFlopBtn = $("startFlopBtn");
   const startTurnBtn = $("startTurnBtn");
   const startRiverBtn = $("startRiverBtn");
 
   if (street === "preflop") {
-    // Make it clickable after selecting enough board cards.
-    // If actions are not finished yet, the click handler will show a message.
-    startFlopBtn.disabled = !(state.temp.boardSelection.length === 3);
+    startFlopBtn.disabled = !(stageReady && state.temp.boardSelection.length === 3);
     startTurnBtn.disabled = true;
     startRiverBtn.disabled = true;
   } else if (street === "flop") {
     startFlopBtn.disabled = true;
-    startTurnBtn.disabled = !(state.temp.boardSelection.length === 1);
+    startTurnBtn.disabled = !(stageReady && state.temp.boardSelection.length === 1);
     startRiverBtn.disabled = true;
   } else if (street === "turn") {
     startFlopBtn.disabled = true;
     startTurnBtn.disabled = true;
-    startRiverBtn.disabled = !(state.temp.boardSelection.length === 1);
+    startRiverBtn.disabled = !(stageReady && state.temp.boardSelection.length === 1);
   } else {
     startFlopBtn.disabled = true;
     startTurnBtn.disabled = true;
@@ -1118,12 +1117,18 @@ $("startFlopBtn").addEventListener("click", () => {
   try {
     const hand = state.hand;
     if (!hand || hand.street !== "preflop") return;
-    if (!isStreetOver(hand)) return alert("这一阶段还没结束，请先把行动录完。");
-    if (state.temp.boardSelection.length !== 3) return alert("翻牌需要选 3 张公牌。");
+    if (hand.currentActorSeat != null) {
+      $("resultView").textContent = "这一阶段还没结束：请先把行动录完。";
+      return;
+    }
+    if (state.temp.boardSelection.length !== 3) {
+      $("resultView").textContent = "翻牌需要选满 3 张公牌。";
+      return;
+    }
     setStreet("flop");
     renderAll();
   } catch (e) {
-    alert(e.message || String(e));
+    $("resultView").textContent = e.message || String(e);
   }
 });
 
@@ -1131,12 +1136,18 @@ $("startTurnBtn").addEventListener("click", () => {
   try {
     const hand = state.hand;
     if (!hand || hand.street !== "flop") return;
-    if (!isStreetOver(hand)) return alert("这一阶段还没结束，请先把行动录完。");
-    if (state.temp.boardSelection.length !== 1) return alert("转牌需要选 1 张公牌。");
+    if (hand.currentActorSeat != null) {
+      $("resultView").textContent = "这一阶段还没结束：请先把行动录完。";
+      return;
+    }
+    if (state.temp.boardSelection.length !== 1) {
+      $("resultView").textContent = "转牌需要选满 1 张公牌。";
+      return;
+    }
     setStreet("turn");
     renderAll();
   } catch (e) {
-    alert(e.message || String(e));
+    $("resultView").textContent = e.message || String(e);
   }
 });
 
@@ -1144,12 +1155,18 @@ $("startRiverBtn").addEventListener("click", () => {
   try {
     const hand = state.hand;
     if (!hand || hand.street !== "turn") return;
-    if (!isStreetOver(hand)) return alert("这一阶段还没结束，请先把行动录完。");
-    if (state.temp.boardSelection.length !== 1) return alert("河牌需要选 1 张公牌。");
+    if (hand.currentActorSeat != null) {
+      $("resultView").textContent = "这一阶段还没结束：请先把行动录完。";
+      return;
+    }
+    if (state.temp.boardSelection.length !== 1) {
+      $("resultView").textContent = "河牌需要选满 1 张公牌。";
+      return;
+    }
     setStreet("river");
     renderAll();
   } catch (e) {
-    alert(e.message || String(e));
+    $("resultView").textContent = e.message || String(e);
   }
 });
 
