@@ -808,6 +808,27 @@ function renderActionPanel(hand) {
     $("currentActorText").textContent = "该阶段结束";
     $("toCallLabel").textContent = "0";
     $("actionHint").textContent = actionHintText(hand);
+
+    // When there is no actor, disable all action buttons to avoid "tap does nothing".
+    for (const id of ["foldBtn", "checkBtn", "callBtn", "raiseBtn", "allInBtn"]) {
+      const b = $(id);
+      if (b) b.disabled = true;
+    }
+
+    // Only show "end hand" on river (after last card).
+    const endBtn = $("endHandBtn");
+    const endRow = $("endHandRow");
+    if (hand.street === "river") {
+      if (endBtn) endBtn.classList.remove("hidden");
+      if (endRow) endRow.classList.remove("hidden");
+      $("resultView").textContent =
+        $("resultView").textContent && $("resultView").textContent.trim()
+          ? $("resultView").textContent
+          : "河牌阶段已结束：当前没有可行动玩家。你可以结束本手牌回到设置。";
+    } else {
+      if (endBtn) endBtn.classList.add("hidden");
+      if (endRow) endRow.classList.add("hidden");
+    }
     return;
   }
 
